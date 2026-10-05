@@ -5,18 +5,53 @@
   "author": "نوّاس",
   "baseUrl": "https://<username>.github.io/nawras/",
   "nav": [
-    { "label": "الرئيسية", "href": "index.html", "key": "home" },
-    { "label": "من أنا", "href": "about/index.html", "key": "about" },
-    { "label": "مقالات", "href": "index.html#articles", "key": "articles" },
-    { "label": "التصنيفات", "href": "categories/index.html", "key": "categories" },
-    { "label": "تواصل", "href": "contact/index.html", "key": "contact" }
+    {
+      "label": "الرئيسية",
+      "href": "index.html",
+      "key": "home"
+    },
+    {
+      "label": "من أنا",
+      "href": "about/index.html",
+      "key": "about"
+    },
+    {
+      "label": "مقالات",
+      "href": "index.html#articles",
+      "key": "articles"
+    },
+    {
+      "label": "التصنيفات",
+      "href": "categories/index.html",
+      "key": "categories"
+    },
+    {
+      "label": "تواصل",
+      "href": "contact/index.html",
+      "key": "contact"
+    }
   ],
   "social": [
-    { "label": "إكس", "key": "x", "href": "https://x.com/" },
-    { "label": "غيت هاب", "key": "github", "href": "https://github.com/" },
-    { "label": "تيليغرام", "key": "telegram", "href": "https://t.me/" },
-    { "label": "انستغرام", "key": "instagram", "href": "https://instagram.com/" }
+    {
+      "label": "إكس",
+      "key": "x",
+      "href": "https://x.com/"
+    },
+    {
+      "label": "غيت هاب",
+      "key": "github",
+      "href": "https://github.com/"
+    },
+    {
+      "label": "تيليغرام",
+      "key": "telegram",
+      "href": "https://t.me/"
+    },
+    {
+      "label": "انستغرام",
+      "key": "instagram",
+      "href": "https://instagram.com/"
+    }
   ],
-  "formspreeEndpoint": "https://formspree.io/f/YOUR_FORM_ID",
   "footer": "جميع الحقوق محفوظة © مدونة نوّاس"
 }

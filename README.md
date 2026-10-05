@@ -63,11 +63,6 @@ npx serve dist
   ونسخها الداكنة داخل `[data-theme="dark"]`.
 - **روابط التواصل:** عدّل مصفوفة `social` (الرابط والنص).
 - **روابط التنقل:** عدّل مصفوفة `nav`.
-- **نموذج الاشتراك (Formspree):**
-  1. سجّل في https://formspree.io وأنشئ نموذجًا جديدًا.
-  2. انسخ الـ endpoint مثل `https://formspree.io/f/xxxxxx`.
-  3. ضعه في `formspreeEndpoint` داخل `site.config.json`.
-  4. أعد البناء والدفع. بدون هذا سيظهر النموذج رسالة تطلب التفعيل.
 
 ## النشر على GitHub Pages
 

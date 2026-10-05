@@ -53,7 +53,7 @@ function articlePage(a, bodyHtml) {
     OG_IMAGE: ogImg, PREFIX: prefix, NAV: navHtml(prefix), SOCIAL: socialHtml(),
     CATEGORY: a.category, DATE_AR: arDate(a.date), READING: a.readingTime + ' دقائق قراءة',
     IMAGE: a.image ? `<img src="${prefix}${a.image}" alt="${a.title}" style="border:1px solid var(--line)">` : '',
-    BODY: bodyHtml, SLUG: a.slug, FOOTER: cfg.footer, FORM_ENDPOINT: cfg.formspreeEndpoint
+    BODY: bodyHtml, SLUG: a.slug, FOOTER: cfg.footer
   });
 }
 function simplePage(title, bodyHtml, depth) {
@@ -62,17 +62,18 @@ function simplePage(title, bodyHtml, depth) {
     SITE_NAME: cfg.siteName, TITLE: title, EXCERPT: cfg.description.replace(/"/g, '&quot;'),
     OG_IMAGE: '', PREFIX: prefix, NAV: navHtml(prefix), SOCIAL: socialHtml(),
     CATEGORY: 'صفحة', DATE_AR: '', READING: '',
-    IMAGE: '', BODY: `<h1>${title}</h1>` + bodyHtml, SLUG: '', FOOTER: cfg.footer, FORM_ENDPOINT: cfg.formspreeEndpoint
+    IMAGE: '', BODY: `<h1>${title}</h1>` + bodyHtml, SLUG: '', FOOTER: cfg.footer
   });
 }
 function main() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
-  const files = fs.readdirSync(path.join(ROOT, 'articles')).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(path.join(ROOT, 'articles')).filter(f => f.endsWith('.md') && f.toLowerCase() !== 'readme.md');
   const articles = files.map(f => {
     const slug = path.basename(f, '.md');
     const raw = fs.readFileSync(path.join(ROOT, 'articles', f), 'utf8');
     const { data, content } = matter(raw);
+    if (!data || !data.title) { console.log('Skipped (no front matter title): ' + f); return null; }
     const bodyHtml = marked.parse(content);
     let d = data.date || '2026-01-01';
     if (d instanceof Date) d = d.toISOString().slice(0, 10);
@@ -83,7 +84,7 @@ function main() {
       image: data.image || '', featured: !!data.featured, readingTime: readingOf(content)
     };
     return { ...a, bodyHtml };
-  }).sort((x, y) => String(y.date).localeCompare(String(x.date)));
+  }).filter(Boolean).sort((x, y) => String(y.date).localeCompare(String(x.date)));
   const meta = articles.map(({ bodyHtml, ...m }) => m);
   fs.writeFileSync(path.join(DIST, 'articles.json'), JSON.stringify(meta, null, 2));
   for (const a of articles) {
@@ -94,7 +95,7 @@ function main() {
   const home = fill(indexTpl, {
     SITE_NAME: cfg.siteName, TAGLINE: cfg.tagline, DESCRIPTION: cfg.description,
     PREFIX: PREFIX_FOR(0), NAV: navHtml(PREFIX_FOR(0)), SOCIAL: socialHtml(),
-    FOOTER: cfg.footer, FORM_ENDPOINT: cfg.formspreeEndpoint
+    FOOTER: cfg.footer
   });
   fs.writeFileSync(path.join(DIST, 'index.html'), home);
   const aboutRaw = fs.readFileSync(path.join(ROOT, 'about.md'), 'utf8');
@@ -107,7 +108,7 @@ function main() {
   fs.mkdirSync(path.join(DIST, 'contact'), { recursive: true });
   const contactBody = `<h1>تواصل</h1><p>يسعدني تواصلك! اختر الوسيلة المناسبة:</p>` +
     cfg.social.map(s => `<p><a href="${s.href}">${s.label}</a></p>`).join('') +
-    `<p>أو عبر نموذج الاشتراك في الصفحة الرئيسية.</p>`;
+    `<p>أهلًا بك في أي وقت.</p>`;
   fs.writeFileSync(path.join(DIST, 'contact', 'index.html'), simplePage('تواصل', contactBody, 1));
   const base = cfg.baseUrl.replace(/\/$/, '');
   const urls = ['', 'about/', 'categories/', 'contact/'].concat(articles.map(a => `articles/${a.slug}/`));
