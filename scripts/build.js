@@ -65,15 +65,36 @@ function simplePage(title, bodyHtml, depth) {
     IMAGE: '', BODY: `<h1>${title}</h1>` + bodyHtml, SLUG: '', FOOTER: cfg.footer
   });
 }
+function slugify(name, n) {
+  let s = String(name).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  if (!s || !/[a-z0-9]/.test(s)) {
+    const h = require('crypto').createHash('md5').update(String(name), 'utf8').digest('hex').slice(0, 6);
+    s = 'article-' + (h || String(n));
+  }
+  return s.slice(0, 80).replace(/-+$/g, '') || ('article-' + n);
+}
 function main() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
   const files = fs.readdirSync(path.join(ROOT, 'articles')).filter(f => f.endsWith('.md') && f.toLowerCase() !== 'readme.md');
-  const articles = files.map(f => {
-    const slug = path.basename(f, '.md');
+  const used = new Map();
+  const articles = files.map((f, idx) => {
+    const rawName = path.basename(f, '.md');
+    let slug = slugify(rawName, idx + 1);
+    if (used.has(slug)) {
+      const k = used.get(slug) + 1;
+      used.set(slug, k);
+      let c = 2;
+      let cand = slug + '-' + c;
+      while (used.has(cand)) { c++; cand = slug + '-' + c; }
+      console.warn('Duplicate slug "' + slug + '" from "' + f + '", using "' + cand + '" instead.');
+      slug = cand;
+    }
+    used.set(slug, 1);
     const raw = fs.readFileSync(path.join(ROOT, 'articles', f), 'utf8');
     const { data, content } = matter(raw);
-    if (!data || !data.title) { console.log('Skipped (no front matter title): ' + f); return null; }
+    if (!data || !data.title) { console.warn('WARNING: skipped "' + f + '" (missing front-matter "title").'); return null; }
     const bodyHtml = marked.parse(content);
     let d = data.date || '2026-01-01';
     if (d instanceof Date) d = d.toISOString().slice(0, 10);
